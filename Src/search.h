@@ -30,7 +30,7 @@ class Search
 
         SearchResult                                            sresult; //This will store the search result
         std::list<Node>                                         lppath, hppath; //
-        std::unordered_map<long long, Node*>                          points2nodes;
+        std::unordered_map<long long, Node*>                    cells2nodes;
         std::set<Node*, std::function<bool(Node*, Node*)>>      OPEN;
         std::unordered_set<Node*>                               CLOSE;
 };

@@ -1,5 +1,4 @@
 #include "search.h"
-#include <iostream>
 
 auto NodeCompare = [](const Node* lhs, const Node* rhs) {
     return std::tie(lhs->F, lhs->i, lhs->j) < std::tie(rhs->F, rhs->i, rhs->j);
@@ -10,7 +9,7 @@ Search::Search() : OPEN(NodeCompare) {
 }
 
 Search::~Search() {
-    for (auto it = points2nodes.begin(); it != points2nodes.end(); ++it) {
+    for (auto it = cells2nodes.begin(); it != cells2nodes.end(); ++it) {
         delete it->second;
     }
 }
@@ -19,15 +18,16 @@ Search::~Search() {
 SearchResult Search::startSearch(ILogger* Logger, const Map& map, const EnvironmentOptions& options) {
     auto startTime = std::chrono::system_clock::now();
 
-    std::pair<int, int> start = map.getStartPoint(), goal = map.getGoalPoint();
-    points2nodes[1LL * start.first * map.getMapWidth() + start.second] = new Node(
+    std::pair<int, int> start = map.getStartCell(), goal = map.getGoalCell();
+    cells2nodes[1LL * start.first * map.getMapWidth() + start.second] = new Node(
         start.first,
         start.second,
         0,
         getHeuristic(start.first, start.second, map, options),
+        options.hweight,
         nullptr
     );
-    OPEN.insert(points2nodes[1LL * start.first * map.getMapWidth() + start.second]);
+    OPEN.insert(cells2nodes[1LL * start.first * map.getMapWidth() + start.second]);
 
     while (!OPEN.empty()) {
         ++sresult.numberofsteps;
@@ -48,7 +48,7 @@ SearchResult Search::startSearch(ILogger* Logger, const Map& map, const Environm
                 continue;
             } else if (successor->g > now->g + cost) {
                 successor->g = now->g + cost;
-                successor->F = successor->g + successor->H;
+                successor->updateF();
                 successor->parent = now;
                 OPEN.erase(successor);
                 OPEN.insert(successor);
@@ -76,10 +76,10 @@ std::vector<std::pair<Node*, double>> Search::getSuccessors(Node* node, const Ma
                     cost = sqrt(2);
                 }
 
-                Node* successor = points2nodes[1LL * i * map.getMapWidth() + j];
+                Node* successor = cells2nodes[1LL * i * map.getMapWidth() + j];
                 if (successor == nullptr) {
-                    successor = new Node(i, j, node->g + cost, getHeuristic(i, j, map, options), node);
-                    points2nodes[1LL * i * map.getMapWidth() + j] = successor;
+                    successor = new Node(i, j, node->g + cost, getHeuristic(i, j, map, options), options.hweight, node);
+                    cells2nodes[1LL * i * map.getMapWidth() + j] = successor;
                     OPEN.insert(successor);
                 }
                 successors.push_back({successor, cost});
@@ -138,18 +138,23 @@ void Search::setSearchResult(bool pathFound) {
 }
 
 double Search::getHeuristic(int i, int j, const Map& map, const EnvironmentOptions& options) {
-    auto [goal_i, goal_j] = map.getGoalPoint();
-    int di = abs(i - goal_i), dj = abs(j - goal_j);
-
-    if (options.metrictype == 0) {
-        return sqrt(2) * std::min(di, dj) + abs(di - dj);
-    } else if (options.metrictype == 1) {
-        return di + dj;
-    } else if (options.metrictype == 2) {
-        return sqrt(pow(di, 2) + pow(dj, 2));
-    } else if (options.metrictype == 3) {
-        return std::max(di, dj);
+    if (options.searchtype == CN_SP_ST_DIJK) {
+        return 0;
     }
 
-    return 0;
+    auto [goal_i, goal_j] = map.getGoalCell();
+    int di = abs(i - goal_i), dj = abs(j - goal_j);
+
+    switch (options.metrictype) {
+        case CN_SP_MT_DIAG:
+            return sqrt(2) * std::min(di, dj) + abs(di - dj);
+        case CN_SP_MT_MANH:
+            return di + dj;
+        case CN_SP_MT_EUCL:
+            return sqrt(pow(di, 2) + pow(dj, 2));
+        case CN_SP_MT_CHEB:
+            return std::max(di, dj);
+        default:
+            return 0;
+    }
 }

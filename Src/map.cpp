@@ -339,10 +339,10 @@ double Map::getCellSize() const
       return cellSize;
 }
 
-std::pair<int, int> Map::getStartPoint() const {
+std::pair<int, int> Map::getStartCell() const {
     return {start_i, start_j};
 }
 
-std::pair<int, int> Map::getGoalPoint() const {
+std::pair<int, int> Map::getGoalCell() const {
     return {goal_i, goal_j};
 }
