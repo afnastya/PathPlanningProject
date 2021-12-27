@@ -11,14 +11,14 @@
 ### Linux
 - Git 2.7.4 или выше
 - CMake 3.2 или выше;
-- GCC 4.9 или выше;
+- GCC 10 или выше;
 - Make
 - QtCreator и Qt5 (по желанию).
 
 ### Mac
 - Git 2.23.0 или выше
 - CMake 3.2 или выше;
-- Apple LLVM version 10.0.0 (clang-1000.11.45.5) или выше;
+- Apple LLVM version 11.0.3 (clang-1000.11.45.5) или выше;
 - Make
 - QtCreator и Qt5 (по желанию).
 

@@ -73,7 +73,7 @@ std::vector<std::pair<Node*, double>> Search::getSuccessors(Node* node, const Ma
                     if (!checkDiagonalSuccessor(node, i, j, map, options)) {
                         continue;
                     }
-                    cost = sqrt(2);
+                    cost = CN_SQRT_TWO;
                 }
 
                 Node* successor = cells2nodes[1LL * i * map.getMapWidth() + j];
@@ -147,7 +147,7 @@ double Search::getHeuristic(int i, int j, const Map& map, const EnvironmentOptio
 
     switch (options.metrictype) {
         case CN_SP_MT_DIAG:
-            return sqrt(2) * std::min(di, dj) + abs(di - dj);
+            return CN_SQRT_TWO * std::min(di, dj) + abs(di - dj);
         case CN_SP_MT_MANH:
             return di + dj;
         case CN_SP_MT_EUCL:
