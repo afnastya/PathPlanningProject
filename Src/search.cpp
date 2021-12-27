@@ -4,6 +4,7 @@ auto NodeCompare = [](const Node* lhs, const Node* rhs) {
     return std::tie(lhs->F, lhs->g, lhs->i, lhs->j) < std::tie(rhs->F, rhs->g, rhs->i, rhs->j);
 };
 
+
 Search::Search() : OPEN(NodeCompare) {
     sresult.numberofsteps = 0;
 }
@@ -47,10 +48,12 @@ SearchResult Search::startSearch(ILogger* Logger, const Map& map, const Environm
             if (CLOSE.contains(successor)) {
                 continue;
             } else if (successor->g > now->g + cost) {
+                OPEN.erase(successor);
+
                 successor->g = now->g + cost;
                 successor->updateF();
                 successor->parent = now;
-                OPEN.erase(successor);
+
                 OPEN.insert(successor);
             }
         }
