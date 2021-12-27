@@ -1,7 +1,7 @@
 #include "search.h"
 
 auto NodeCompare = [](const Node* lhs, const Node* rhs) {
-    return std::tie(lhs->F, lhs->i, lhs->j) < std::tie(rhs->F, rhs->i, rhs->j);
+    return std::tie(lhs->F, lhs->g, lhs->i, lhs->j) < std::tie(rhs->F, rhs->g, rhs->i, rhs->j);
 };
 
 Search::Search() : OPEN(NodeCompare) {
@@ -68,7 +68,7 @@ std::vector<std::pair<Node*, double>> Search::getSuccessors(Node* node, const Ma
     for (int i = std::max(0, node->i - 1); i < std::min(node->i + 2, map.getMapHeight()); ++i) {
         for (int j = std::max(0, node->j - 1); j < std::min(node->j + 2, map.getMapWidth()); ++j) {
             if (map.CellIsTraversable(i, j)) {
-                double cost = 1;
+                double cost = 1.0;
                 if ((i + j) % 2 == (node->i + node->j) % 2) {
                     if (!checkDiagonalSuccessor(node, i, j, map, options)) {
                         continue;
